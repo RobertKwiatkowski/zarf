@@ -2,8 +2,6 @@ package test
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -166,34 +164,7 @@ func (e2e *ZarfE2ETest) checkIfClusterRunning() bool {
 	return false
 }
 
-func (e2e *ZarfE2ETest) waitForHealthyCluster() error {
-	attempt := 0
-	for attempt < 15 {
-		pods, err := e2e.clientset.CoreV1().Pods("kube-system").List(context.TODO(), metav1.ListOptions{})
-		if err == nil && len(pods.Items) >= 0 {
-			allPodsHealthy := true
-
-			// Make sure at the pods are in the 'succeeded' or 'running' state
-			for _, pod := range pods.Items {
-				if !(pod.Status.Phase == v1.PodSucceeded || pod.Status.Phase == v1.PodRunning) {
-					allPodsHealthy = false
-					break
-				}
-			}
-
-			if allPodsHealthy {
-				fmt.Printf("💥 Cluster %s ready. You can access it by setting:\nexport KUBECONFIG='%s'\n", e2e.clusterName, e2e.kubeconfigPath)
-				return nil
-			}
-		}
-
-		time.Sleep(1 * time.Second)
-		attempt++
-	}
-
-	return errors.New("unable to connect to cluster for e2e tests")
-}
-
+// Return true if the user wants to use the built-in K3s, false otherwise
 func shouldCreateK3sCluster() bool {
 	return os.Getenv("TESTDISTRO") == "k3s"
 }
