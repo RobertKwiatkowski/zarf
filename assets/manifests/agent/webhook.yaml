@@ -5,9 +5,9 @@ metadata:
 webhooks:
   - name: agent-hook.zarf.dev
     namespaceSelector:
-      matchLabels:
-        # Only operate on zarf-managed resources
-        app.kubernetes.io/managed-by: "zarf"
+      # matchLabels:
+      #   # Only operate on zarf-managed resources, temporary until webhook handles secret creation
+      #   app.kubernetes.io/managed-by: "zarf"
       matchExpressions:
         # Ensure we don't mess with kube-sustem
         - key: name
